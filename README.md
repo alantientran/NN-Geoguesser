@@ -10,7 +10,7 @@ The architecture combines a convolutional frontend for local feature extraction 
 ## 🔍 Intended Use
 
 ### Primary Purpose
-- Predict (latitude, longitude) coordinates from Street View images.
+- Predict geolocation grid cell (based off Google S2 Geometry) from Google Street View images.
 
 ### Research Applications
 - Visual geolocation
@@ -26,37 +26,33 @@ The architecture combines a convolutional frontend for local feature extraction 
 
 ## 🏗️ Model Architecture
 
-- **Input**: RGB image (3:2 aspect ratio, optionally square for robustness testing)
+- **Input**: RGB image (3:2 aspect ratio converted to 224x224)
 - **Backbone**:
-  - Convolutional layers (e.g., ResNet34, ConvNeXt)
-  - Vision Transformer (ViT) encoder
+  - Convolutional layers (ResNet50)
+  - Vision Transformer (ViT) encoder (vit_small_patch16_224)
 - **Output**:
-  - Coordinate regression: (Latitude, Longitude)
-  - Optional: country classification or region cluster prediction
+  - Grid cell classification: Google's S2 Geometry Grid Cell
 
 ---
 
 ## 📦 Datasets
 
 ### 🗺️ Training Dataset
-**[OpenStreetView-5M](https://huggingface.co/datasets/osv5m/osv5m)**  
-- ~5 million images from Google Street View  
+**[OpenStreetView-5M Subset](https://www.kaggle.com/datasets/josht000/osv-mini-129k)**  
+- ~129k images from Google Street View for 10 US states
 - Global GPS coordinate annotations  
 - High variety in terrain and cultural environments
 
 **Preprocessing Includes**:
-- Resizing, normalization, color jitter
-- Coordinate normalization (e.g., spherical projection)
-- Optional tiling/cropping for ablation and robustness studies
+- Resizing, normalization
+- Mapping coordinates to S2 geometry grid system
 
 ---
 
 ## 📊 Evaluation Metrics
 
-- **Mean Geodesic Distance (MGD)**  
-- **Median Distance Error**  
-- **Hit Rate** within threshold distances (e.g., 10km, 100km, 500km)  
-- **Visual Attention Maps** for interpretability
+- **Top-1, Top-3, Top-5 prediction accuracy** 
+- **Occlusion Sensitivity Analysis** for interpretability
 
 ---
 
@@ -64,21 +60,18 @@ The architecture combines a convolutional frontend for local feature extraction 
 
 ### ✅ Experiment 1: Vision Transformer Ablation
 
-**Goal**: Measure the transformer's contribution to geolocation accuracy.
+**Goal**: To understand what parts of an image the CNN-ViT hybrid model relies on to predict geolocation
 
-- Vary the number of transformer layers (e.g., 12 → 6 → 3)
-- Vary attention heads (e.g., 12 → 6 → 3)
-- Compare geolocation performance and attention visualizations
-
+- Slide a 32x32 pixel occlusion with stride 8
+- Calculate drop in the model's confidence when sliding occlusion
 ---
 
-### ✅ Experiment 2: Robustness to Context & Aspect Ratio
+### ✅ Experiment 2: Probability Distribution Visualized on a Map
 
-**Goal**: Test the model’s ability to generalize under limited field-of-view.
+**Goal**: Determine if the model clusters its predictions around the correct class or if the probability distribution is spread out
 
-- Evaluate on square-cropped test set from OSV5M
-- Evaluate on **[StreetView Image Dataset](https://www.kaggle.com/datasets/ayuseless/streetview-image-dataset/data)** (square images)
-- Compare against original 3:2 test set
+- Visualize the S2 Geometry grid system on US map with state lines
+- Color model predictions to visually identify clusters
 
 ---
 
@@ -124,3 +117,4 @@ The architecture combines a convolutional frontend for local feature extraction 
 
 - [OpenStreetView-5M Dataset](https://huggingface.co/datasets/osv5m/osv5m)
 - [StreetView Image Dataset (Kaggle)](https://www.kaggle.com/datasets/ayuseless/streetview-image-dataset/data)
+- [PlaNet - Photo Geolocation with Convolutional Neural Network](https://arxiv.org/abs/1602.05314)
