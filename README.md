@@ -1,4 +1,4 @@
-# GeoViT: A Convolutional-Transformer Model for Geolocation Estimation
+# GeoViT: A Convolutional-Transformer Model for Geolocation Prediction
 
 ## 🧠 Model Summary
 **GeoViT** is a hybrid convolutional-transformer neural network developed to predict geographic locations from Google Street View images. Inspired by the game *Geoguessr*, the model learns visual geographical cues such as architecture, road signs, vegetation, and terrain using the [OpenStreetView-5M](https://huggingface.co/datasets/osv5m/osv5m) dataset.
